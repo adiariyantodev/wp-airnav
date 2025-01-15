@@ -1,0 +1,7 @@
+.breakdance .bde-rich-text {
+  max-width: 100%;
+}
+
+.breakdance .bde-rich-text > :last-child li:last-child > p {
+  margin-bottom: 0;
+}
