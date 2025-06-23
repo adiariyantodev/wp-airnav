@@ -185,6 +185,71 @@ add_shortcode('echain_jumarr_int', 'echain_jumarr_int_shortcode');
 //}
 //add_action('login_init', 'custom_login_redirect');
 
+add_action('init', function () {
+    $ip = $_SERVER['REMOTE_ADDR'];
+
+    // Hanya tangani ketika akses ke /rnavdb
+    if ($_SERVER['REQUEST_URI'] === '/rnavdb') {
+        if (preg_match('/^172\.20\./', $ip)) {
+            // Jika IP VPN, redirect ke phpMyAdmin
+            wp_redirect(home_url('/phpmyadmin'));
+        } else {
+            // Jika bukan IP VPN, redirect ke homepage
+            wp_redirect(home_url('/'));
+        }
+        exit;
+    }
+});
+
+
+add_filter('send_auth_cookies', function($cookie) {
+    return true; // memastikan cookies dikirim
+});
+
+add_filter('secure_auth_cookie', '__return_true');
+add_filter('logged_in_cookie', '__return_true');
+ini_set('session.cookie_httponly', 1);
+
+ini_set( 'session.cookie_secure', 1 );
+ini_set( 'session.cookie_httponly', 1 );
+
+add_filter( 'secure_auth_cookie', '__return_true' );
+add_filter( 'secure_logged_in_cookie', '__return_true' );
+add_filter( 'secure_logged_out_cookie', '__return_true' );
+
+add_filter( 'send_origin_headers', function () {
+    if ( is_ssl() ) {
+        header_remove("Set-Cookie");
+        // Cookie akan diatur ulang oleh WP saat ini
+    }
+});
+
+
+add_action( 'init', function() {
+    // Ambil semua cookie yang sudah dikirim WordPress
+    foreach (headers_list() as $header) {
+        if (stripos($header, 'Set-Cookie:') === 0) {
+            // Jika belum ada HttpOnly, tambahkan
+            if (stripos($header, 'httponly') === false) {
+                header_remove('Set-Cookie'); // Hapus semua dulu
+                break;
+            }
+        }
+    }
+
+    // Kirim ulang cookie dengan HttpOnly dan Secure
+    foreach ($_COOKIE as $key => $value) {
+        setcookie($key, $value, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => is_ssl(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+});
+
+
 function remove_comments_menu() {
     remove_menu_page( 'edit-comments.php' );
 }

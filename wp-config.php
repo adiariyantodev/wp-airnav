@@ -93,6 +93,9 @@ define('DISABLE_WP_CRON', true);
 
 /* Add any custom values between this line and the "stop editing" line. */
 
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1); // Hanya jika kamu pakai HTTPS
+ini_set('session.cookie_samesite', 'Lax'); // Opsional
 
 
 /* That's all, stop editing! Happy publishing. */
