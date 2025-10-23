@@ -12,27 +12,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 
-# Blokir akses ke folder .git
-RedirectMatch 404 ^/\.git
-
-# Blokir akses ke folder wp-includes (kecuali file penting seperti .css, .js, dsb)
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-
-  # Jika akses ke wp-includes selain file tertentu, tampilkan 404
-  RewriteCond %{REQUEST_URI} ^/wp-includes/
-  RewriteCond %{REQUEST_URI} !^/wp-includes/.*\.(css|js|png|jpg|jpeg|gif|woff|woff2|ttf|svg|eot)$
-  RewriteRule ^wp-includes/ - [R=404,L]
-</IfModule>
-
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteRule ^phpmyadmin(/.*)?$ - [R=404,L]
-</IfModule>
-
-<IfModule mod_headers.c>
-    Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
-</IfModule>
-
-
 # END WordPress
